@@ -1,39 +1,38 @@
-pipeline{
-
-    agent any
-
-// uncomment the following lines by removing /* and */ to enable
-    tools{
-       maven 'maven' 
+pipeline {
+  agent any
+  stages {
+    stage('build') {
+      steps {
+        sh 'mvn compile'
+      }
     }
-    
 
-    stages{
-        stage('build'){
-            steps{
-
-                sh 'mvn compile'
-            }
-        }
-        stage('test'){
-            steps{
-
-                sh 'mvn clean test'
-            }
-        }
-        stage('package'){
-            steps{
-
-                sh 'mvn package -DskipTests'
-            }
-        }
+    stage('test') {
+      steps {
+        sh 'mvn clean test'
+      }
     }
-    
-    post{
-        always{
-            echo 'this pipeline has completed...'
-        }
-        
+
+    stage('package') {
+      steps {
+        sh 'mvn package -DskipTests'
+      }
     }
-    
+
+    stage('Archive') {
+      steps {
+        archiveArtifacts '**/target/*.jar'
+      }
+    }
+
+  }
+  tools {
+    maven 'maven'
+  }
+  post {
+    always {
+      echo 'this pipeline has completed...'
+    }
+
+  }
 }
